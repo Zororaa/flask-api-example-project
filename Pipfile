@@ -10,6 +10,8 @@ python-dotenv = "*"
 flask-smorest = "==0.45.0"
 sqlalchemy = "==2.0.36"
 flask-sqlalchemy = "==3.1.1"
+flask-jwt-extended = "*"
+passlib = "*"
 
 [dev-packages]
 

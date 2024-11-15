@@ -15,18 +15,21 @@ blp = Blueprint("stores", __name__, description="Operations on stores")
 class Stores(MethodView):
     @blp.response(200, StoreSchema)
     def get(self, store_id):
-        store = StoreModel.get_or_404(store_id)
+        store = StoreModel.query.get_or_404(store_id)
         return store
     
     def delete(self, store_id):
-        store = StoreModel.get_or_404(store_id)
-        raise NotImplementedError("Deleting a store is not implemented.")
-            
+        store = StoreModel.query.get_or_404(store_id)
+        db.session.delete(store)
+        db.session.commit()
+        return{"message": "Store deleted"}, 200
+
+
 @blp.route("/store")
 class StoreList(MethodView):
     @blp.response(200, StoreSchema(many=True))
     def get(self):
-        return stores.values()
+        return StoreModel.query.all()
 
     @blp.arguments(StoreSchema)
     @blp.response(201, StoreSchema)
@@ -38,5 +41,10 @@ class StoreList(MethodView):
             db.session.commit()
         except SQLAlchemyError:
             abort(500, message="An error has occured while inserting data to the database")
+        except IntegrityError:
+            abort(
+                400,
+                message="A store with that name already exists.",
+            )
 
         return store
